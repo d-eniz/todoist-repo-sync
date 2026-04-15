@@ -6,6 +6,7 @@ const {
   buildTaskDescription,
   getInput,
   normalizeGitHubItem,
+  parseSectionSpec,
   parsePriority,
   parseBoolean,
   parseList,
@@ -159,6 +160,13 @@ test("getInput reads second hyphenated GitHub action input env vars", () => {
   assert.equal(getInput("fallback-time-date", { defaultValue: "false" }), "true");
 
   delete process.env["INPUT_FALLBACK-TIME-DATE"];
+});
+
+test("parseSectionSpec supports plain section names and project-qualified format", () => {
+  assert.deepEqual(parseSectionSpec("Inbox", "123"), { projectId: "123", sectionName: "Inbox" });
+  assert.deepEqual(parseSectionSpec("123|Inbox", "999"), { projectId: "123", sectionName: "Inbox" });
+  assert.equal(parseSectionSpec("", "123"), null);
+  assert.throws(() => parseSectionSpec("123|", "123"), /Invalid section spec/);
 });
 
 test("parsePriority maps P values to Todoist priority integers", () => {

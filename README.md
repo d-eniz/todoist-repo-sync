@@ -57,6 +57,7 @@ jobs:
           default-priority: P4
           add-reminder: false
           fallback-time-date: false
+          # default-section: Inbox
 ```
 
 If you only want live sync for issue or PR events, you can omit `schedule`, `workflow_dispatch`, and `github-token`.
@@ -78,6 +79,7 @@ For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/t
 | `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. Todoist API stores this as `4` for urgent down to `1` for normal. |
 | `add-reminder` | no | `false` | Adds an absolute reminder for one minute after task creation. |
 | `fallback-time-date` | no | `false` | If reminder creation fails with Todoist premium-only reminder error, updates task with exact due date/time one minute from now. Useful with Todoist automatic reminders on free plans. |
+| `default-section` | no |  | Optional Todoist section target. Use section name like `Inbox` or `project_id|Inbox`. |
 | `task-template` | no | `[{{repo}}] {{kind}} #{{number}}: {{title}}` | Template for Todoist task content. |
 | `description-template` | no | `{{desc}}` | Human-readable part of the Todoist description. The source line is appended automatically as `Source: {{url}}`. |
 
@@ -125,6 +127,15 @@ Recommended workflow permissions:
 If `add-reminder` fails because Todoist rejects custom reminders as premium-only, set `fallback-time-date: true`.
 
 This fallback does not create a Todoist custom reminder. Instead it sets the task due date/time to one minute from now. Todoist can then notify at task time through its automatic reminder feature, if the account has automatic reminders enabled in Todoist settings.
+
+## Sections
+
+Set `default-section` if tasks should land in a specific Todoist section inside target project.
+
+- `Inbox`
+- `2203306141|Inbox`
+
+If `project_id|section` form is used, project ID must match `todoist-project-id`.
 
 ## Release and usage
 

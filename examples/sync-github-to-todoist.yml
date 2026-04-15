@@ -26,3 +26,4 @@ jobs:
           default-priority: P4
           add-reminder: false
           fallback-time-date: false
+          # default-section: Inbox

@@ -44,6 +44,9 @@ inputs:
     description: If reminder creation fails, set task due date/time to one minute from now instead.
     required: false
     default: "false"
+  default-section:
+    description: Optional Todoist section target. Accepts section name or project_id|section name.
+    required: false
   task-template:
     description: Template for Todoist task content.
     required: false

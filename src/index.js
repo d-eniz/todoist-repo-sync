@@ -6,6 +6,7 @@ const {
   buildTaskDescription,
   getInput,
   normalizeGitHubItem,
+  parseSectionSpec,
   parsePriority,
   parseBoolean,
   parseList,
@@ -102,6 +103,22 @@ async function createTodoistTask(todoistToken, payload) {
   });
 }
 
+async function listTodoistSections(todoistToken, projectId) {
+  const url = new URL(`${TODOIST_BASE_URL}/sections`);
+  url.searchParams.set("project_id", projectId);
+  const sections = await requestJson(url, {
+    headers: todoistHeaders(todoistToken)
+  });
+
+  if (Array.isArray(sections)) {
+    return sections;
+  }
+  if (Array.isArray(sections?.results)) {
+    return sections.results;
+  }
+  return [];
+}
+
 async function updateTodoistTask(todoistToken, taskId, payload) {
   return requestJson(`${TODOIST_BASE_URL}/tasks/${taskId}`, {
     method: "POST",
@@ -142,6 +159,30 @@ async function createTodoistReminder(todoistToken, taskId, reminderDateTime) {
   if (syncStatus !== "ok") {
     throw new Error(`Failed to create Todoist reminder for task ${taskId}: ${JSON.stringify(syncStatus)}`);
   }
+}
+
+async function resolveSectionId(todoistToken, projectId, defaultSection) {
+  const sectionSpec = parseSectionSpec(defaultSection, projectId);
+  if (!sectionSpec) {
+    return null;
+  }
+
+  if (sectionSpec.projectId && sectionSpec.projectId !== String(projectId)) {
+    throw new Error(
+      `Default section project ID "${sectionSpec.projectId}" does not match configured Todoist project "${projectId}".`
+    );
+  }
+
+  const sections = await listTodoistSections(todoistToken, projectId);
+  const matchedSection = sections.find(
+    (section) => String(section?.name ?? "").trim().toLowerCase() === sectionSpec.sectionName.toLowerCase()
+  );
+
+  if (!matchedSection) {
+    throw new Error(`Todoist section "${sectionSpec.sectionName}" not found in project ${projectId}.`);
+  }
+
+  return matchedSection.id;
 }
 
 function githubHeaders(githubToken) {
@@ -268,6 +309,10 @@ async function syncItems(items, options) {
     existingTasks = await listTodoistTasks(options.todoistToken, options.todoistProjectId);
   }
 
+  const sectionId = options.defaultSection
+    ? await resolveSectionId(options.todoistToken, options.todoistProjectId, options.defaultSection)
+    : null;
+
   for (const item of items) {
     const content = buildTaskContent(item, options.taskTemplate);
     const description = buildTaskDescription(item, options.descriptionTemplate);
@@ -282,7 +327,8 @@ async function syncItems(items, options) {
       content,
       description,
       project_id: options.todoistProjectId,
-      priority: options.defaultPriority
+      priority: options.defaultPriority,
+      ...(sectionId ? { section_id: sectionId } : {})
     });
 
     if (options.addReminder) {
@@ -338,6 +384,7 @@ async function main() {
     defaultPriority: parsePriority(getInput("default-priority", { defaultValue: "P4" })),
     addReminder: parseBoolean(getInput("add-reminder", { defaultValue: "false" }), false),
     fallbackTimeDate: parseBoolean(getInput("fallback-time-date", { defaultValue: "false" }), false),
+    defaultSection: getInput("default-section"),
     taskTemplate: getInput("task-template", { defaultValue: "[{{repo}}] {{kind}} #{{number}}: {{title}}" }),
     descriptionTemplate: getInput("description-template", { defaultValue: "{{desc}}" }),
     repo,

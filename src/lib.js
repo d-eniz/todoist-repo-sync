@@ -124,6 +124,33 @@ function buildReminderDateTime(now = new Date()) {
   return reminderAt.toISOString().replace(/\.\d{3}Z$/, ".000000Z");
 }
 
+function parseSectionSpec(value, defaultProjectId = "") {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const separatorIndex = trimmed.indexOf("|");
+  if (separatorIndex === -1) {
+    return {
+      projectId: String(defaultProjectId ?? "").trim(),
+      sectionName: trimmed
+    };
+  }
+
+  const projectId = trimmed.slice(0, separatorIndex).trim();
+  const sectionName = trimmed.slice(separatorIndex + 1).trim();
+
+  if (!sectionName) {
+    throw new Error(`Invalid section spec "${value}". Use "Section Name" or "project_id|Section Name".`);
+  }
+
+  return {
+    projectId,
+    sectionName
+  };
+}
+
 function taskMatchesItem(task, item) {
   const marker = sourceMarker(item);
   const description = String(task?.description ?? "");
@@ -140,6 +167,7 @@ module.exports = {
   buildReminderDateTime,
   getInput,
   normalizeGitHubItem,
+  parseSectionSpec,
   parsePriority,
   parseBoolean,
   parseList,
