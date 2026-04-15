@@ -31,5 +31,6 @@ jobs:
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
           github-token: ${{ github.token }}
           default-priority: P2
+          default-section: Backlog
           add-reminder: true
           fallback-time-date: true
