@@ -23,3 +23,5 @@ jobs:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
           github-token: ${{ github.token }}
+          default-priority: P4
+          add-reminder: false

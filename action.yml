@@ -32,6 +32,14 @@ inputs:
     description: Skip creating a Todoist task when an active task with the same GitHub source marker already exists.
     required: false
     default: "true"
+  default-priority:
+    description: Default Todoist priority. Use P1, P2, P3, or P4. P4 is the default.
+    required: false
+    default: P4
+  add-reminder:
+    description: Add an absolute reminder for one minute after task creation.
+    required: false
+    default: "false"
   task-template:
     description: Template for Todoist task content.
     required: false
@@ -39,7 +47,7 @@ inputs:
   description-template:
     description: Template for the human-readable part of the Todoist description.
     required: false
-    default: "{{url}}"
+    default: "{{desc}}"
 
 outputs:
   created-count:

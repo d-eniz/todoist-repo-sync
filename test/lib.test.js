@@ -1,10 +1,12 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  buildReminderDateTime,
   buildTaskContent,
   buildTaskDescription,
   getInput,
   normalizeGitHubItem,
+  parsePriority,
   parseBoolean,
   parseList,
   renderTemplate,
@@ -28,12 +30,13 @@ test("buildTaskDescription appends the GitHub source marker", () => {
     repo: "octo/example",
     type: "issue",
     number: 42,
+    desc: "Investigate redirect loop",
     url: "https://github.com/octo/example/issues/42"
   };
 
   assert.equal(
-    buildTaskDescription(item, "{{url}}"),
-    "https://github.com/octo/example/issues/42\n\nSource: github://octo/example/issue/42"
+    buildTaskDescription(item, "{{desc}}"),
+    "Investigate redirect loop\n\nSource: https://github.com/octo/example/issues/42"
   );
 });
 
@@ -41,7 +44,8 @@ test("taskMatchesItem matches Todoist tasks by marker", () => {
   const item = {
     repo: "octo/example",
     type: "pull-request",
-    number: 7
+    number: 7,
+    url: "https://github.com/octo/example/pull/7"
   };
 
   assert.equal(
@@ -61,6 +65,7 @@ test("normalizeGitHubItem keeps issue and PR metadata consistent", () => {
       number: 10,
       title: "Bug report",
       html_url: "https://github.com/octo/example/issues/10",
+      body: "Steps to reproduce",
       user: { login: "alice" },
       assignees: [{ login: "bob" }]
     },
@@ -71,6 +76,7 @@ test("normalizeGitHubItem keeps issue and PR metadata consistent", () => {
       number: 11,
       title: "Fix bug",
       html_url: "https://github.com/octo/example/pull/11",
+      body: "Patch details",
       pull_request: {},
       user: { login: "alice" },
       assignees: []
@@ -86,6 +92,7 @@ test("normalizeGitHubItem keeps issue and PR metadata consistent", () => {
       number: issue.number,
       title: issue.title,
       url: issue.url,
+      desc: issue.desc,
       author: issue.author,
       assignees: issue.assignees
     },
@@ -96,6 +103,7 @@ test("normalizeGitHubItem keeps issue and PR metadata consistent", () => {
       number: 10,
       title: "Bug report",
       url: "https://github.com/octo/example/issues/10",
+      desc: "Steps to reproduce",
       author: "alice",
       assignees: "bob"
     }
@@ -132,4 +140,16 @@ test("getInput falls back to env vars when action input is empty", () => {
   assert.equal(getInput("todoist-token", { required: true, fallbackEnv: ["TODOIST_TOKEN"] }), "secret-token");
 
   delete process.env.TODOIST_TOKEN;
+});
+
+test("parsePriority maps P values to Todoist priority integers", () => {
+  assert.equal(parsePriority("P1"), 4);
+  assert.equal(parsePriority("p2"), 3);
+  assert.equal(parsePriority("P3"), 2);
+  assert.equal(parsePriority("P4"), 1);
+  assert.throws(() => parsePriority("urgent"), /Invalid priority/);
+});
+
+test("buildReminderDateTime sets reminder one minute ahead", () => {
+  assert.equal(buildReminderDateTime(new Date("2026-04-15T10:00:00.000Z")), "2026-04-15T10:01:00.000000Z");
 });

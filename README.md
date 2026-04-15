@@ -17,9 +17,9 @@ For each matching GitHub issue or pull request, the action creates a Todoist tas
 - description:
 
 ```text
-https://github.com/owner/repo/issues/123
+Investigate login redirect loop when session expires.
 
-Source: github://owner/repo/issue/123
+Source: https://github.com/owner/repo/issues/123
 ```
 
 For pull requests, the task content uses `PR` instead of `Issue`.
@@ -54,6 +54,8 @@ jobs:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
           github-token: ${{ github.token }}
+          default-priority: P4
+          add-reminder: false
 ```
 
 If you only want live sync for issue or PR events, you can omit `schedule`, `workflow_dispatch`, and `github-token`.
@@ -72,8 +74,10 @@ For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/t
 | `include-issues` | no | `true` | Set to `false` to ignore issues. |
 | `include-pull-requests` | no | `true` | Set to `false` to ignore pull requests. |
 | `skip-duplicates` | no | `true` | Skips creation when an active task with the same GitHub source marker is already in the Todoist project. |
+| `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. |
+| `add-reminder` | no | `false` | Adds an absolute reminder for one minute after task creation. |
 | `task-template` | no | `[{{repo}}] {{kind}} #{{number}}: {{title}}` | Template for Todoist task content. |
-| `description-template` | no | `{{url}}` | Human-readable part of the Todoist description. The GitHub source marker is appended automatically. |
+| `description-template` | no | `{{desc}}` | Human-readable part of the Todoist description. The source line is appended automatically as `Source: {{url}}`. |
 
 ## Template variables
 
@@ -84,6 +88,8 @@ You can use these placeholders in `task-template` and `description-template`:
 - `{{number}}`
 - `{{title}}`
 - `{{url}}`
+- `{{desc}}`
+- `{{body}}`
 - `{{state}}`
 - `{{author}}`
 - `{{assignees}}`

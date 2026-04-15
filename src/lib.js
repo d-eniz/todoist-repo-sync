@@ -60,7 +60,7 @@ function escapeDescriptionBlock(value) {
 }
 
 function sourceMarker(item) {
-  return `Source: github://${item.repo}/${item.type}/${item.number}`;
+  return `Source: ${item.url}`;
 }
 
 function buildTaskContent(item, template) {
@@ -87,10 +87,33 @@ function normalizeGitHubItem(raw, repo) {
     number: raw.number,
     title: raw.title ?? "",
     url: raw.html_url ?? "",
+    body: raw.body ?? "",
+    desc: raw.body ?? "",
     state: raw.state ?? "",
     author: raw.user?.login ?? "",
     assignees: Array.isArray(raw.assignees) ? raw.assignees.map((assignee) => assignee.login).join(", ") : ""
   };
+}
+
+function parsePriority(value, defaultValue = "P4") {
+  const normalized = String(value ?? defaultValue).trim().toUpperCase() || defaultValue;
+  const mapping = {
+    P1: 4,
+    P2: 3,
+    P3: 2,
+    P4: 1
+  };
+
+  if (!(normalized in mapping)) {
+    throw new Error(`Invalid priority "${value}". Use P1, P2, P3, or P4.`);
+  }
+
+  return mapping[normalized];
+}
+
+function buildReminderDateTime(now = new Date()) {
+  const reminderAt = new Date(now.getTime() + 60_000);
+  return reminderAt.toISOString().replace(/\.\d{3}Z$/, ".000000Z");
 }
 
 function taskMatchesItem(task, item) {
@@ -106,8 +129,10 @@ function sortItems(items) {
 module.exports = {
   buildTaskContent,
   buildTaskDescription,
+  buildReminderDateTime,
   getInput,
   normalizeGitHubItem,
+  parsePriority,
   parseBoolean,
   parseList,
   renderTemplate,

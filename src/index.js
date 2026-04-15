@@ -1,10 +1,12 @@
 const fs = require("node:fs");
 const crypto = require("node:crypto");
 const {
+  buildReminderDateTime,
   buildTaskContent,
   buildTaskDescription,
   getInput,
   normalizeGitHubItem,
+  parsePriority,
   parseBoolean,
   parseList,
   sortItems,
@@ -93,6 +95,40 @@ async function createTodoistTask(todoistToken, payload) {
     headers: todoistHeaders(todoistToken, true),
     body: JSON.stringify(payload)
   });
+}
+
+async function createTodoistReminder(todoistToken, taskId, reminderDateTime) {
+  const uuid = crypto.randomUUID();
+  const tempId = crypto.randomUUID();
+  const body = new URLSearchParams({
+    sync_token: "*",
+    resource_types: JSON.stringify(["reminders"]),
+    commands: JSON.stringify([
+      {
+        type: "reminder_add",
+        temp_id: tempId,
+        uuid,
+        args: {
+          item_id: String(taskId),
+          type: "absolute",
+          due: {
+            date: reminderDateTime
+          }
+        }
+      }
+    ])
+  });
+
+  const response = await requestJson(`${TODOIST_BASE_URL}/sync`, {
+    method: "POST",
+    headers: todoistHeaders(todoistToken),
+    body
+  });
+  const syncStatus = response?.sync_status?.[uuid];
+
+  if (syncStatus !== "ok") {
+    throw new Error(`Failed to create Todoist reminder for task ${taskId}: ${JSON.stringify(syncStatus)}`);
+  }
 }
 
 function githubHeaders(githubToken) {
@@ -232,8 +268,13 @@ async function syncItems(items, options) {
     const createdTask = await createTodoistTask(options.todoistToken, {
       content,
       description,
-      project_id: options.todoistProjectId
+      project_id: options.todoistProjectId,
+      priority: options.defaultPriority
     });
+
+    if (options.addReminder) {
+      await createTodoistReminder(options.todoistToken, createdTask.id, buildReminderDateTime());
+    }
 
     info(`Created Todoist task ${createdTask.id} for ${item.kind} #${item.number}.`);
     stats.createdCount += 1;
@@ -266,8 +307,10 @@ async function main() {
     includeIssues: parseBoolean(getInput("include-issues", { defaultValue: "true" }), true),
     includePullRequests: parseBoolean(getInput("include-pull-requests", { defaultValue: "true" }), true),
     skipDuplicates: parseBoolean(getInput("skip-duplicates", { defaultValue: "true" }), true),
+    defaultPriority: parsePriority(getInput("default-priority", { defaultValue: "P4" })),
+    addReminder: parseBoolean(getInput("add-reminder", { defaultValue: "false" }), false),
     taskTemplate: getInput("task-template", { defaultValue: "[{{repo}}] {{kind}} #{{number}}: {{title}}" }),
-    descriptionTemplate: getInput("description-template", { defaultValue: "{{url}}" }),
+    descriptionTemplate: getInput("description-template", { defaultValue: "{{desc}}" }),
     repo,
     githubApiUrl: process.env.GITHUB_API_URL || "https://api.github.com"
   };
