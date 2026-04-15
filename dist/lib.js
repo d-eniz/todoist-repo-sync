@@ -7,16 +7,22 @@ function inputKey(name) {
 function getInput(name, options = {}) {
   const value = process.env[inputKey(name)] ?? "";
   const trimmed = value.trim();
+  const fallbackValue = Array.isArray(options.fallbackEnv)
+    ? options.fallbackEnv
+        .map((envName) => process.env[envName] ?? "")
+        .find((candidate) => String(candidate).trim() !== "")
+    : "";
+  const resolved = trimmed || String(fallbackValue).trim();
 
-  if (!trimmed && options.required) {
+  if (!resolved && options.required) {
     throw new Error(`Missing required input: ${name}`);
   }
 
-  if (!trimmed && options.defaultValue !== undefined) {
+  if (!resolved && options.defaultValue !== undefined) {
     return options.defaultValue;
   }
 
-  return trimmed;
+  return resolved;
 }
 
 function parseBoolean(value, defaultValue = false) {

@@ -37,6 +37,9 @@ jobs:
       - name: Run local action
         if: ${{ steps.validate_secrets.outputs.available == 'true' }}
         uses: ./
+        env:
+          TODOIST_TOKEN: ${{ secrets.TODOIST_TOKEN }}
+          TODOIST_PROJECT_ID: ${{ secrets.TODOIST_PROJECT_ID }}
         with:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}

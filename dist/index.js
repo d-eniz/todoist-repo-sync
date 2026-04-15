@@ -252,9 +252,9 @@ async function main() {
   }
 
   const options = {
-    todoistToken: getInput("todoist-token", { required: true }),
-    todoistProjectId: getInput("todoist-project-id", { required: true }),
-    githubToken: getInput("github-token"),
+    todoistToken: getInput("todoist-token", { required: true, fallbackEnv: ["TODOIST_TOKEN"] }),
+    todoistProjectId: getInput("todoist-project-id", { required: true, fallbackEnv: ["TODOIST_PROJECT_ID"] }),
+    githubToken: getInput("github-token", { fallbackEnv: ["GITHUB_TOKEN"] }),
     mode: getInput("mode", { defaultValue: "auto" }),
     allowedActions: parseList(getInput("allowed-actions", { defaultValue: "opened,reopened,assigned" })),
     includeIssues: parseBoolean(getInput("include-issues", { defaultValue: "true" }), true),

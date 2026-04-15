@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const {
   buildTaskContent,
   buildTaskDescription,
+  getInput,
   normalizeGitHubItem,
   parseBoolean,
   parseList,
@@ -122,4 +123,13 @@ test("buildTaskContent keeps the default title format", () => {
   );
 
   assert.equal(content, "[octo/example] PR #12: Improve docs");
+});
+
+test("getInput falls back to env vars when action input is empty", () => {
+  process.env.TODOIST_TOKEN = "secret-token";
+  delete process.env.INPUT_TODOIST_TOKEN;
+
+  assert.equal(getInput("todoist-token", { required: true, fallbackEnv: ["TODOIST_TOKEN"] }), "secret-token");
+
+  delete process.env.TODOIST_TOKEN;
 });
