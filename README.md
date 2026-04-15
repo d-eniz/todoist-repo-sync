@@ -49,7 +49,7 @@ jobs:
       pull-requests: read
     steps:
       - name: Create or backfill Todoist tasks
-        uses: your-org/todoist-repo-sync@v1
+        uses: d-eniz/todoist-repo-sync@v1
         with:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
@@ -79,7 +79,7 @@ For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/t
 | `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. Todoist API stores this as `4` for urgent down to `1` for normal. |
 | `add-reminder` | no | `false` | Adds an absolute reminder for one minute after task creation. |
 | `fallback-time-date` | no | `false` | If reminder creation fails with Todoist premium-only reminder error, updates task with exact due date/time one minute from now. Useful with Todoist automatic reminders on free plans. |
-| `default-section` | no |  | Optional Todoist section target. Use section name like `Inbox` or `project_id|Inbox`. |
+| `default-section` | no |  | Optional Todoist section target. Use section name like `Inbox` or `project_id\|Inbox`. |
 | `task-template` | no | `[{{repo}}] {{kind}} #{{number}}: {{title}}` | Template for Todoist task content. |
 | `description-template` | no | `{{desc}}` | Human-readable part of the Todoist description. The source line is appended automatically as `Source: {{url}}`. |
 
