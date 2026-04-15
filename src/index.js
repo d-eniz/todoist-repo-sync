@@ -11,7 +11,7 @@ const {
   taskMatchesItem
 } = require("./lib");
 
-const TODOIST_BASE_URL = "https://api.todoist.com/rest/v2";
+const TODOIST_BASE_URL = "https://api.todoist.com/rest/v1";
 
 function setOutput(name, value) {
   const outputPath = process.env.GITHUB_OUTPUT;
