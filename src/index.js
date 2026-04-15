@@ -11,7 +11,7 @@ const {
   taskMatchesItem
 } = require("./lib");
 
-const TODOIST_BASE_URL = "https://api.todoist.com/rest/v1";
+const TODOIST_BASE_URL = "https://api.todoist.com/api/v1";
 
 function setOutput(name, value) {
   const outputPath = process.env.GITHUB_OUTPUT;
@@ -78,7 +78,13 @@ async function listTodoistTasks(todoistToken, projectId) {
   const tasks = await requestJson(url, {
     headers: todoistHeaders(todoistToken)
   });
-  return Array.isArray(tasks) ? tasks : [];
+  if (Array.isArray(tasks)) {
+    return tasks;
+  }
+  if (Array.isArray(tasks?.results)) {
+    return tasks.results;
+  }
+  return [];
 }
 
 async function createTodoistTask(todoistToken, payload) {
