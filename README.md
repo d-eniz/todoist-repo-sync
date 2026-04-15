@@ -58,6 +58,8 @@ jobs:
 
 If you only want live sync for issue or PR events, you can omit `schedule`, `workflow_dispatch`, and `github-token`.
 
+For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/todoist-repo-sync/.github/workflows/demo-sync.yml:1). It checks out repo, then runs action with `uses: ./`.
+
 ## Inputs
 
 | Input | Required | Default | Notes |
