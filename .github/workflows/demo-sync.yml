@@ -16,13 +16,24 @@ jobs:
       contents: read
       issues: read
       pull-requests: read
+    env:
+      TODOIST_TOKEN_VALUE: ${{ secrets.TODOIST_TOKEN }}
+      TODOIST_PROJECT_ID_VALUE: ${{ secrets.TODOIST_PROJECT_ID }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Explain missing secrets
+        if: ${{ env.TODOIST_TOKEN_VALUE == '' || env.TODOIST_PROJECT_ID_VALUE == '' }}
+        run: |
+          echo "Todoist secrets unavailable for this run."
+          echo "Common causes: fork PR, Dependabot, wrong secret scope, or missing secret name."
+          exit 1
+
       - name: Run local action
+        if: ${{ env.TODOIST_TOKEN_VALUE != '' && env.TODOIST_PROJECT_ID_VALUE != '' }}
         uses: ./
         with:
-          todoist-token: ${{ secrets.TODOIST_TOKEN }}
-          todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
+          todoist-token: ${{ env.TODOIST_TOKEN_VALUE }}
+          todoist-project-id: ${{ env.TODOIST_PROJECT_ID_VALUE }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
