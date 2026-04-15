@@ -4,8 +4,16 @@ function inputKey(name) {
   return `${INPUT_PREFIX}${name.replace(/ /g, "_").replace(/-/g, "_").toUpperCase()}`;
 }
 
+function inputKeyVariants(name) {
+  const normalized = String(name).toUpperCase().replace(/ /g, "_");
+  return [`${INPUT_PREFIX}${normalized.replace(/-/g, "_")}`, `${INPUT_PREFIX}${normalized}`];
+}
+
 function getInput(name, options = {}) {
-  const value = process.env[inputKey(name)] ?? "";
+  const value =
+    inputKeyVariants(name)
+      .map((envName) => process.env[envName] ?? "")
+      .find((candidate) => String(candidate).trim() !== "") ?? "";
   const trimmed = value.trim();
   const fallbackValue = Array.isArray(options.fallbackEnv)
     ? options.fallbackEnv
@@ -98,10 +106,10 @@ function normalizeGitHubItem(raw, repo) {
 function parsePriority(value, defaultValue = "P4") {
   const normalized = String(value ?? defaultValue).trim().toUpperCase() || defaultValue;
   const mapping = {
-    P1: 4,
-    P2: 3,
-    P3: 2,
-    P4: 1
+    P1: 1,
+    P2: 2,
+    P3: 3,
+    P4: 4
   };
 
   if (!(normalized in mapping)) {

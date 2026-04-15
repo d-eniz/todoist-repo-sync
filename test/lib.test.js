@@ -136,17 +136,27 @@ test("buildTaskContent keeps the default title format", () => {
 test("getInput falls back to env vars when action input is empty", () => {
   process.env.TODOIST_TOKEN = "secret-token";
   delete process.env.INPUT_TODOIST_TOKEN;
+  delete process.env["INPUT_TODOIST-TOKEN"];
 
   assert.equal(getInput("todoist-token", { required: true, fallbackEnv: ["TODOIST_TOKEN"] }), "secret-token");
 
   delete process.env.TODOIST_TOKEN;
 });
 
+test("getInput reads hyphenated GitHub action input env vars", () => {
+  process.env["INPUT_ADD-REMINDER"] = "true";
+  delete process.env.INPUT_ADD_REMINDER;
+
+  assert.equal(getInput("add-reminder", { defaultValue: "false" }), "true");
+
+  delete process.env["INPUT_ADD-REMINDER"];
+});
+
 test("parsePriority maps P values to Todoist priority integers", () => {
-  assert.equal(parsePriority("P1"), 4);
-  assert.equal(parsePriority("p2"), 3);
-  assert.equal(parsePriority("P3"), 2);
-  assert.equal(parsePriority("P4"), 1);
+  assert.equal(parsePriority("P1"), 1);
+  assert.equal(parsePriority("p2"), 2);
+  assert.equal(parsePriority("P3"), 3);
+  assert.equal(parsePriority("P4"), 4);
   assert.throws(() => parsePriority("urgent"), /Invalid priority/);
 });
 

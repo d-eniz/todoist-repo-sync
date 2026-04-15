@@ -273,7 +273,9 @@ async function syncItems(items, options) {
     });
 
     if (options.addReminder) {
-      await createTodoistReminder(options.todoistToken, createdTask.id, buildReminderDateTime());
+      const reminderDateTime = buildReminderDateTime();
+      await createTodoistReminder(options.todoistToken, createdTask.id, reminderDateTime);
+      info(`Created Todoist reminder for task ${createdTask.id} at ${reminderDateTime}.`);
     }
 
     info(`Created Todoist task ${createdTask.id} for ${item.kind} #${item.number}.`);
