@@ -16,24 +16,28 @@ jobs:
       contents: read
       issues: read
       pull-requests: read
-    env:
-      TODOIST_TOKEN_VALUE: ${{ secrets.TODOIST_TOKEN }}
-      TODOIST_PROJECT_ID_VALUE: ${{ secrets.TODOIST_PROJECT_ID }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Explain missing secrets
-        if: ${{ env.TODOIST_TOKEN_VALUE == '' || env.TODOIST_PROJECT_ID_VALUE == '' }}
+      - name: Validate Todoist secrets
+        id: validate_secrets
+        env:
+          TODOIST_TOKEN_VALUE: ${{ secrets.TODOIST_TOKEN }}
+          TODOIST_PROJECT_ID_VALUE: ${{ secrets.TODOIST_PROJECT_ID }}
         run: |
-          echo "Todoist secrets unavailable for this run."
-          echo "Common causes: fork PR, Dependabot, wrong secret scope, or missing secret name."
-          exit 1
+          if [ -z "$TODOIST_TOKEN_VALUE" ] || [ -z "$TODOIST_PROJECT_ID_VALUE" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Todoist secrets unavailable for this run."
+            echo "Common causes: fork PR, Dependabot, wrong secret scope, or missing secret name."
+            exit 1
+          fi
+          echo "available=true" >> "$GITHUB_OUTPUT"
 
       - name: Run local action
-        if: ${{ env.TODOIST_TOKEN_VALUE != '' && env.TODOIST_PROJECT_ID_VALUE != '' }}
+        if: ${{ steps.validate_secrets.outputs.available == 'true' }}
         uses: ./
         with:
-          todoist-token: ${{ env.TODOIST_TOKEN_VALUE }}
-          todoist-project-id: ${{ env.TODOIST_PROJECT_ID_VALUE }}
+          todoist-token: ${{ secrets.TODOIST_TOKEN }}
+          todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
