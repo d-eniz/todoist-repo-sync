@@ -152,6 +152,15 @@ test("getInput reads hyphenated GitHub action input env vars", () => {
   delete process.env["INPUT_ADD-REMINDER"];
 });
 
+test("getInput reads second hyphenated GitHub action input env vars", () => {
+  process.env["INPUT_FALLBACK-TIME-DATE"] = "true";
+  delete process.env.INPUT_FALLBACK_TIME_DATE;
+
+  assert.equal(getInput("fallback-time-date", { defaultValue: "false" }), "true");
+
+  delete process.env["INPUT_FALLBACK-TIME-DATE"];
+});
+
 test("parsePriority maps P values to Todoist priority integers", () => {
   assert.equal(parsePriority("P1"), 1);
   assert.equal(parsePriority("p2"), 2);

@@ -97,6 +97,14 @@ async function createTodoistTask(todoistToken, payload) {
   });
 }
 
+async function updateTodoistTask(todoistToken, taskId, payload) {
+  return requestJson(`${TODOIST_BASE_URL}/tasks/${taskId}`, {
+    method: "POST",
+    headers: todoistHeaders(todoistToken, true),
+    body: JSON.stringify(payload)
+  });
+}
+
 async function createTodoistReminder(todoistToken, taskId, reminderDateTime) {
   const uuid = crypto.randomUUID();
   const tempId = crypto.randomUUID();
@@ -274,8 +282,21 @@ async function syncItems(items, options) {
 
     if (options.addReminder) {
       const reminderDateTime = buildReminderDateTime();
-      await createTodoistReminder(options.todoistToken, createdTask.id, reminderDateTime);
-      info(`Created Todoist reminder for task ${createdTask.id} at ${reminderDateTime}.`);
+      try {
+        await createTodoistReminder(options.todoistToken, createdTask.id, reminderDateTime);
+        info(`Created Todoist reminder for task ${createdTask.id} at ${reminderDateTime}.`);
+      } catch (error) {
+        if (!options.fallbackTimeDate) {
+          throw error;
+        }
+
+        await updateTodoistTask(options.todoistToken, createdTask.id, {
+          due_datetime: reminderDateTime
+        });
+        info(
+          `Reminder creation failed for task ${createdTask.id}; applied due_datetime fallback at ${reminderDateTime}.`
+        );
+      }
     }
 
     info(`Created Todoist task ${createdTask.id} for ${item.kind} #${item.number}.`);
@@ -311,6 +332,7 @@ async function main() {
     skipDuplicates: parseBoolean(getInput("skip-duplicates", { defaultValue: "true" }), true),
     defaultPriority: parsePriority(getInput("default-priority", { defaultValue: "P4" })),
     addReminder: parseBoolean(getInput("add-reminder", { defaultValue: "false" }), false),
+    fallbackTimeDate: parseBoolean(getInput("fallback-time-date", { defaultValue: "false" }), false),
     taskTemplate: getInput("task-template", { defaultValue: "[{{repo}}] {{kind}} #{{number}}: {{title}}" }),
     descriptionTemplate: getInput("description-template", { defaultValue: "{{desc}}" }),
     repo,

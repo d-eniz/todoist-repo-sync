@@ -40,6 +40,10 @@ inputs:
     description: Add an absolute reminder for one minute after task creation.
     required: false
     default: "false"
+  fallback-time-date:
+    description: If reminder creation fails, set task due date/time to one minute from now instead.
+    required: false
+    default: "false"
   task-template:
     description: Template for Todoist task content.
     required: false

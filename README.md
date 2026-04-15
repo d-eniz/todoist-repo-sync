@@ -56,6 +56,7 @@ jobs:
           github-token: ${{ github.token }}
           default-priority: P4
           add-reminder: false
+          fallback-time-date: false
 ```
 
 If you only want live sync for issue or PR events, you can omit `schedule`, `workflow_dispatch`, and `github-token`.
@@ -76,6 +77,7 @@ For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/t
 | `skip-duplicates` | no | `true` | Skips creation when an active task with the same GitHub source marker is already in the Todoist project. |
 | `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. |
 | `add-reminder` | no | `false` | Adds an absolute reminder for one minute after task creation. |
+| `fallback-time-date` | no | `false` | If reminder creation fails, updates task with exact due date/time one minute from now. Useful on free Todoist plans. |
 | `task-template` | no | `[{{repo}}] {{kind}} #{{number}}: {{title}}` | Template for Todoist task content. |
 | `description-template` | no | `{{desc}}` | Human-readable part of the Todoist description. The source line is appended automatically as `Source: {{url}}`. |
 

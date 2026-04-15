@@ -25,3 +25,4 @@ jobs:
           github-token: ${{ github.token }}
           default-priority: P4
           add-reminder: false
+          fallback-time-date: false

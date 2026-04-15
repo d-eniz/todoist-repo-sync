@@ -32,3 +32,4 @@ jobs:
           github-token: ${{ github.token }}
           default-priority: P2
           add-reminder: true
+          fallback-time-date: true
