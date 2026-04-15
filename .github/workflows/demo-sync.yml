@@ -40,7 +40,8 @@ jobs:
         env:
           TODOIST_TOKEN: ${{ secrets.TODOIST_TOKEN }}
           TODOIST_PROJECT_ID: ${{ secrets.TODOIST_PROJECT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}

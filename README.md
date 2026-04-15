@@ -53,7 +53,7 @@ jobs:
         with:
           todoist-token: ${{ secrets.TODOIST_TOKEN }}
           todoist-project-id: ${{ secrets.TODOIST_PROJECT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
 ```
 
 If you only want live sync for issue or PR events, you can omit `schedule`, `workflow_dispatch`, and `github-token`.
@@ -110,7 +110,7 @@ Recommended workflow permissions:
 - `issues: read`
 - `pull-requests: read`
 
-`github-token` can usually be set to `${{ secrets.GITHUB_TOKEN }}`.
+`github-token` can usually be set to `${{ github.token }}`.
 
 ## Release and usage
 
