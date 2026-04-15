@@ -1,0 +1,14 @@
+{
+  "name": "todoist-repo-sync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable GitHub Action that creates Todoist tasks from GitHub issues and pull requests.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp src/*.js dist/",
+    "test": "node --test"
+  }
+}

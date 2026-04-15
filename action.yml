@@ -1,0 +1,60 @@
+name: Sync GitHub to Todoist
+description: Create Todoist tasks for GitHub issues and pull requests, with optional scheduled backfill.
+author: Deniz + OpenAI Codex
+
+inputs:
+  todoist-token:
+    description: Todoist API token.
+    required: true
+  todoist-project-id:
+    description: Todoist project ID that will receive the created tasks.
+    required: true
+  github-token:
+    description: GitHub token used for scheduled or manual backfill runs.
+    required: false
+  mode:
+    description: auto, event, or backfill. auto uses the current GitHub event to decide.
+    required: false
+    default: auto
+  allowed-actions:
+    description: Comma or newline separated GitHub issue/PR event actions that should create or check tasks.
+    required: false
+    default: opened,reopened,assigned
+  include-issues:
+    description: Whether to sync issues.
+    required: false
+    default: "true"
+  include-pull-requests:
+    description: Whether to sync pull requests.
+    required: false
+    default: "true"
+  skip-duplicates:
+    description: Skip creating a Todoist task when an active task with the same GitHub source marker already exists.
+    required: false
+    default: "true"
+  task-template:
+    description: Template for Todoist task content.
+    required: false
+    default: "[{{repo}}] {{kind}} #{{number}}: {{title}}"
+  description-template:
+    description: Template for the human-readable part of the Todoist description.
+    required: false
+    default: "{{url}}"
+
+outputs:
+  created-count:
+    description: Number of Todoist tasks created during this run.
+  skipped-count:
+    description: Number of GitHub items skipped because of filters or existing tasks.
+  processed-count:
+    description: Number of GitHub items considered during this run.
+  created-task-ids:
+    description: JSON array of created Todoist task IDs.
+
+runs:
+  using: node20
+  main: dist/index.js
+
+branding:
+  icon: check-circle
+  color: red
