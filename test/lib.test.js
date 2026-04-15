@@ -162,10 +162,10 @@ test("getInput reads second hyphenated GitHub action input env vars", () => {
 });
 
 test("parsePriority maps P values to Todoist priority integers", () => {
-  assert.equal(parsePriority("P1"), 1);
-  assert.equal(parsePriority("p2"), 2);
-  assert.equal(parsePriority("P3"), 3);
-  assert.equal(parsePriority("P4"), 4);
+  assert.equal(parsePriority("P1"), 4);
+  assert.equal(parsePriority("p2"), 3);
+  assert.equal(parsePriority("P3"), 2);
+  assert.equal(parsePriority("P4"), 1);
   assert.throws(() => parsePriority("urgent"), /Invalid priority/);
 });
 

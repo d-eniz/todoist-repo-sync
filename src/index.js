@@ -36,6 +36,11 @@ function setFailed(error) {
   process.exitCode = 1;
 }
 
+function isPremiumOnlyReminderError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("PREMIUM_ONLY") || message.includes("Premium only feature");
+}
+
 async function readJsonResponse(response) {
   const text = await response.text();
   if (!text) {
@@ -286,7 +291,7 @@ async function syncItems(items, options) {
         await createTodoistReminder(options.todoistToken, createdTask.id, reminderDateTime);
         info(`Created Todoist reminder for task ${createdTask.id} at ${reminderDateTime}.`);
       } catch (error) {
-        if (!options.fallbackTimeDate) {
+        if (!options.fallbackTimeDate || !isPremiumOnlyReminderError(error)) {
           throw error;
         }
 
@@ -294,7 +299,7 @@ async function syncItems(items, options) {
           due_datetime: reminderDateTime
         });
         info(
-          `Reminder creation failed for task ${createdTask.id}; applied due_datetime fallback at ${reminderDateTime}.`
+          `Reminder premium-only for task ${createdTask.id}; applied due_datetime fallback at ${reminderDateTime}.`
         );
       }
     }

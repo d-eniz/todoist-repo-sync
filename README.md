@@ -75,9 +75,9 @@ For demo inside this repo itself, see [demo-sync.yml](/home/deniz/Repositories/t
 | `include-issues` | no | `true` | Set to `false` to ignore issues. |
 | `include-pull-requests` | no | `true` | Set to `false` to ignore pull requests. |
 | `skip-duplicates` | no | `true` | Skips creation when an active task with the same GitHub source marker is already in the Todoist project. |
-| `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. |
+| `default-priority` | no | `P4` | Default Todoist priority. `P1` is most urgent, `P4` is normal. Todoist API stores this as `4` for urgent down to `1` for normal. |
 | `add-reminder` | no | `false` | Adds an absolute reminder for one minute after task creation. |
-| `fallback-time-date` | no | `false` | If reminder creation fails, updates task with exact due date/time one minute from now. Useful on free Todoist plans. |
+| `fallback-time-date` | no | `false` | If reminder creation fails with Todoist premium-only reminder error, updates task with exact due date/time one minute from now. Useful with Todoist automatic reminders on free plans. |
 | `task-template` | no | `[{{repo}}] {{kind}} #{{number}}: {{title}}` | Template for Todoist task content. |
 | `description-template` | no | `{{desc}}` | Human-readable part of the Todoist description. The source line is appended automatically as `Source: {{url}}`. |
 
@@ -119,6 +119,12 @@ Recommended workflow permissions:
 - `pull-requests: read`
 
 `github-token` can usually be set to `${{ github.token }}`.
+
+## Free-plan fallback
+
+If `add-reminder` fails because Todoist rejects custom reminders as premium-only, set `fallback-time-date: true`.
+
+This fallback does not create a Todoist custom reminder. Instead it sets the task due date/time to one minute from now. Todoist can then notify at task time through its automatic reminder feature, if the account has automatic reminders enabled in Todoist settings.
 
 ## Release and usage
 

@@ -106,10 +106,10 @@ function normalizeGitHubItem(raw, repo) {
 function parsePriority(value, defaultValue = "P4") {
   const normalized = String(value ?? defaultValue).trim().toUpperCase() || defaultValue;
   const mapping = {
-    P1: 1,
-    P2: 2,
-    P3: 3,
-    P4: 4
+    P1: 4,
+    P2: 3,
+    P3: 2,
+    P4: 1
   };
 
   if (!(normalized in mapping)) {
