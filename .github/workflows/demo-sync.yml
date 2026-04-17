@@ -5,8 +5,6 @@ on:
     types: [opened, reopened, assigned]
   pull_request:
     types: [opened, reopened, assigned]
-  schedule:
-    - cron: "0 3 * * *"
   workflow_dispatch:
 
 jobs:
