@@ -136,21 +136,3 @@ Set `default-section` if tasks should land in a specific Todoist section inside 
 - `2203306141|Inbox`
 
 If `project_id|section` form is used, project ID must match `todoist-project-id`.
-
-## Release and usage
-
-To use this action from other repositories:
-
-1. Push this repository to GitHub.
-2. Create a tag such as `v1`.
-3. Reference it as `uses: your-org/todoist-repo-sync@v1`.
-
-The action intentionally does not close or complete Todoist tasks when GitHub issues or pull requests are closed. It only creates and backfills tasks.
-
-## Local development
-
-```bash
-npm test
-```
-
-The checked-in runtime lives in `dist/`, so consumers can use the action without a build step.
